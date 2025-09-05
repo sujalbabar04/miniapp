@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTO Tournament</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with Back Button -->
+        <header class="header">
+            <button class="back-btn" onclick="goBack()" id="backBtn" style="display: none;">
+                ←
+            </button>
+            <div class="header-title" id="headerTitle">🏆 OTO Tournament</div>
+            <div class="user-info">
+                <span id="userBalance" class="balance">₹0</span>
+                <span id="userName">Player</span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="home">🏠 Home</div>
+            <div class="nav-tab" data-tab="tournaments">🎮 Tournaments</div>
+            <div class="nav-tab" data-tab="my-tournaments">📋 My Games</div>
+            <div class="nav-tab" data-tab="wallet">💰 Wallet</div>
+            <div class="nav-tab" data-tab="store">🛒 Store</div>
+            <div class="nav-tab" data-tab="more">⋯ More</div>
+        </nav>
+
+        <!-- Content Sections -->
+        <main>
+            <!-- Home Section -->
+            <section id="home" class="content-section active">
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎮</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalGames">0</div>
+                            <div class="stat-label">Games Played</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalWins">0</div>
+                            <div class="stat-label">Wins</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalEarnings">₹0</div>
+                            <div class="stat-label">Total Earned</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-grid">
+                        <button class="action-btn" onclick="switchTab('tournaments')">
+                            <span class="action-icon">⚡</span>
+                            <span>Join Tournament</span>
+                        </button>
+                        <button class="action-btn" onclick="switchTab('wallet')">
+                            <span class="action-icon">💳</span>
+                            <span>Add Money</span>
+                        </button>
+                        <button class="action-btn" onclick="switchTab('store')">
+                            <span class="action-icon">🎁</span>
+                            <span>Rewards</span>
+                        </button>
+                        <button class="action-btn" onclick="showSupport()">
+                            <span class="action-icon">🎧</span>
+                            <span>Support</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="featured-tournaments">
+                    <h3>🔥 Hot Tournaments</h3>
+                    <div class="featured-list" id="featuredTournaments">
+                        <!-- Featured tournaments will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tournaments Section -->
+            <section id="tournaments" class="content-section">
+                <div class="tournament-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All</button>
+                        <button class="filter-tab" data-filter="bgmi">BGMI</button>
+                        <button class="filter-tab" data-filter="freefire">Free Fire</button>
+                        <button class="filter-tab" data-filter="cod">COD Mobile</button>
+                    </div>
+                    <button class="filter-btn" onclick="showFilters()">🎛️</button>
+                </div>
+                <div class="tournament-grid" id="tournamentGrid">
+                    <!-- Tournament cards will be dynamically loaded -->
+                </div>
+            </section>
+
+            <!-- My Tournaments Section -->
+            <section id="my-tournaments" class="content-section">
+                <div class="my-tournament-tabs">
+                    <button class="my-tab active" data-tab="upcoming">Upcoming</button>
+                    <button class="my-tab" data-tab="live">Live</button>
+                    <button class="my-tab" data-tab="completed">Completed</button>
+                </div>
+                
+                <div class="my-tournament-content">
+                    <div class="my-tournament-list" id="upcomingTournaments">
+                        <!-- Upcoming tournaments -->
+                    </div>
+                    <div class="my-tournament-list" id="liveTournaments" style="display: none;">
+                        <!-- Live tournaments -->
+                    </div>
+                    <div class="my-tournament-list" id="completedTournaments" style="display: none;">
+                        <!-- Completed tournaments -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wallet Section -->
+            <section id="wallet" class="content-section">
+                <div class="wallet-card">
+                    <div class="wallet-header">
+                        <div class="wallet-balance">
+                            <div class="balance-label">Available Balance</div>
+                            <div class="balance-amount" id="walletBalance">₹0</div>
+                        </div>
+                        <div class="wallet-actions">
+                            <button class="wallet-btn deposit-btn" onclick="showDepositModal()">
+                                💳 Add Money
+                            </button>
+                            <button class="wallet-btn withdraw-btn" onclick="showWithdrawModal()">
+                                💸 Withdraw
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wallet-options">
+                    <button class="wallet-option" onclick="showBonusModal()">
+                        <span class="option-icon">🎁</span>
+                        <div class="option-info">
+                            <div class="option-title">Bonus Balance</div>
+                            <div class="option-value" id="bonusBalance">₹0</div>
+                        </div>
+                    </button>
+                    <button class="wallet-option" onclick="showReferralModal()">
+                        <span class="option-icon">👥</span>
+                        <div class="option-info">
+                            <div class="option-title">Referral Earnings</div>
+                            <div class="option-value" id="referralEarnings">₹0</div>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="transaction-history">
+                    <div class="history-header">
+                        <h3>Recent Transactions</h3>
+                        <button class="view-all-btn" onclick="showAllTransactions()">View All</button>
+                    </div>
+                    <div id="transactionList" class="transaction-list">
+                        <!-- Transactions will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Store Section -->
+            <section id="store" class="content-section">
+                <div class="store-categories">
+                    <button class="store-tab active" data-category="rewards">🎁 Rewards</button>
+                    <button class="store-tab" data-category="skins">🎨 Skins</button>
+                    <button class="store-tab" data-category="coins">💰 Coins</button>
+                    <button class="store-tab" data-category="premium">⭐ Premium</button>
+                </div>
+                <div class="store-grid" id="storeGrid">
+                    <!-- Store items will be dynamically loaded -->
+                </div>
+            </section>
+
+            <!-- More Section -->
+            <section id="more" class="content-section">
+                <div class="profile-summary">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">Loading...</div>
+                        <div class="profile-level">Level <span id="userLevel">1</span></div>
+                    </div>
+                    <button class="edit-profile-btn" onclick="showProfileModal()">✏️</button>
+                </div>
+
+                <div class="more-options">
+                    <div class="option-group">
+                        <h4>Account</h4>
+                        <button class="more-option" onclick="showProfileSettings()">
+                            <span class="option-icon">👤</span>
+                            <span>Profile Settings</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="showGameSettings()">
+                            <span class="option-icon">🎮</span>
+                            <span>Game Settings</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="showReferral()">
+                            <span class="option-icon">👥</span>
+                            <span>Refer & Earn</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                    </div>
+
+                    <div class="option-group">
+                        <h4>Support</h4>
+                        <button class="more-option" onclick="showSupport()">
+                            <span class="option-icon">🎧</span>
+                            <span>Help & Support</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="showFAQ()">
+                            <span class="option-icon">❓</span>
+                            <span>FAQ</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="showTerms()">
+                            <span class="option-icon">📋</span>
+                            <span>Terms & Conditions</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                    </div>
+
+                    <div class="option-group">
+                        <h4>Other</h4>
+                        <button class="more-option" onclick="showLeaderboard()">
+                            <span class="option-icon">🏅</span>
+                            <span>Leaderboard</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="showNotifications()">
+                            <span class="option-icon">🔔</span>
+                            <span>Notifications</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                        <button class="more-option" onclick="rateApp()">
+                            <span class="option-icon">⭐</span>
+                            <span>Rate App</span>
+                            <span class="option-arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="content-section">
+                <div class="leaderboard-filters">
+                    <button class="lb-filter active" data-period="daily">Daily</button>
+                    <button class="lb-filter" data-period="weekly">Weekly</button>
+                    <button class="lb-filter" data-period="monthly">Monthly</button>
+                    <button class="lb-filter" data-period="all-time">All Time</button>
+                </div>
+                <div class="leaderboard-list" id="leaderboardList">
+                    <!-- Leaderboard items will be dynamically loaded -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Floating Action Button -->
+        <button class="fab" onclick="showQuickJoin()" title="Quick Join Tournament">⚡</button>
+
+        <!-- Modals -->
+        <!-- Deposit Modal -->
+        <div id="depositModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>💳 Add Money</span>
+                    <button class="close-btn" onclick="closeModal('depositModal')">×</button>
+                </div>
+                <div class="amount-selector">
+                    <div class="amount-options">
+                        <button class="amount-btn" onclick="selectAmount(100, event)">₹100</button>
+                        <button class="amount-btn" onclick="selectAmount(500, event)">₹500</button>
+                        <button class="amount-btn" onclick="selectAmount(1000, event)">₹1000</button>
+                        <button class="amount-btn" onclick="selectAmount(2000, event)">₹2000</button>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Custom Amount (₹)</label>
+                        <input type="number" class="input-field" id="depositAmount" placeholder="Enter amount" min="1">
+                    </div>
+                </div>
+                <div class="bonus-info">
+                    <div class="bonus-text">💝 Get 10% bonus on first deposit!</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('depositModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="processDeposit()">Add Money</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Withdraw Modal -->
+        <div id="withdrawModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>💸 Withdraw Money</span>
+                    <button class="close-btn" onclick="closeModal('withdrawModal')">×</button>
+                </div>
+                <div class="withdraw-info">
+                    <div class="info-item">
+                        <span>Available Balance:</span>
+                        <span class="balance-text" id="availableWithdraw">₹0</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Minimum Withdrawal:</span>
+                        <span>₹100</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Amount (₹)</label>
+                    <input type="number" class="input-field" id="withdrawAmount" placeholder="Enter amount" min="100">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">UPI ID / Account Details</label>
+                    <input type="text" class="input-field" id="upiId" placeholder="yourname@upi or account details">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('withdrawModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="processWithdraw()">Withdraw</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Join Modal -->
+        <div id="joinModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>🎮 Join Tournament</span>
+                    <button class="close-btn" onclick="closeModal('joinModal')">×</button>
+                </div>
+                <div id="tournamentDetails" class="tournament-details">
+                    <!-- Tournament details will be loaded here -->
+                </div>
+                <div class="join-requirements">
+                    <h4>Requirements:</h4>
+                    <ul id="requirementsList">
+                        <!-- Requirements will be loaded here -->
+                    </ul>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('joinModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="confirmJoinTournament()">Join Tournament</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Modal -->
+        <div id="supportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>🎧 Support</span>
+                    <button class="close-btn" onclick="closeModal('supportModal')">×</button>
+                </div>
+                <div class="support-options">
+                    <button class="support-btn" onclick="openChat()">
+                        <span class="support-icon">💬</span>
+                        <div class="support-info">
+                            <div class="support-title">Live Chat</div>
+                            <div class="support-desc">Get instant help</div>
+                        </div>
+                    </button>
+                    <button class="support-btn" onclick="createTicket()">
+                        <span class="support-icon">🎫</span>
+                        <div class="support-info">
+                            <div class="support-title">Create Ticket</div>
+                            <div class="support-desc">Report an issue</div>
+                        </div>
+                    </button>
+                    <button class="support-btn" onclick="callSupport()">
+                        <span class="support-icon">📞</span>
+                        <div class="support-info">
+                            <div class="support-title">Call Support</div>
+                            <div class="support-desc">+91-XXXX-XXXXXX</div>
+                        </div>
+                    </button>
+                    <button class="support-btn" onclick="emailSupport()">
+                        <span class="support-icon">📧</span>
+                        <div class="support-info">
+                            <div class="support-title">Email Us</div>
+                            <div class="support-desc">support@oto.com</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticket Creation Modal -->
+        <div id="ticketModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>🎫 Create Support Ticket</span>
+                    <button class="close-btn" onclick="closeModal('ticketModal')">×</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Subject</label>
+                    <select class="input-field" id="ticketSubject">
+                        <option value="">Select Issue Type</option>
+                        <option value="payment">Payment Issue</option>
+                        <option value="tournament">Tournament Issue</option>
+                        <option value="account">Account Issue</option>
+                        <option value="technical">Technical Issue</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Description</label>
+                    <textarea class="input-field" id="ticketDescription" rows="5" placeholder="Describe your issue in detail..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Priority</label>
+                    <select class="input-field" id="ticketPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('ticketModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitTicket()">Create Ticket</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Setup Modal -->
+        <div id="profileSetupModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>👤 Complete Your Profile</span>
+                    <button class="close-btn" onclick="closeModal('profileSetupModal')">×</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Display Name</label>
+                    <input type="text" class="input-field" id="displayName" placeholder="Enter your display name">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Game ID (BGMI/FreeFire)</label>
+                    <input type="text" class="input-field" id="gameId" placeholder="Enter your game ID">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Phone Number</label>
+                    <input type="tel" class="input-field" id="phoneNumber" placeholder="Enter your phone number">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Preferred Game</label>
+                    <select class="input-field" id="preferredGame">
+                        <option value="bgmi">BGMI</option>
+                        <option value="freefire">Free Fire</option>
+                        <option value="cod">COD Mobile</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="completeProfile()">Save Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Modal -->
+        <div id="filterModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>🎛️ Filters</span>
+                    <button class="close-btn" onclick="closeModal('filterModal')">×</button>
+                </div>
+                <div class="filter-section">
+                    <h4>Entry Fee</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" value="free"> Free
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" value="low"> ₹1 - ₹50
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" value="medium"> ₹51 - ₹200
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" value="high"> ₹200+
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h4>Prize Pool</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" value="small"> ₹0 - ₹1000
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" value="medium"> ₹1000 - ₹5000
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" value="large"> ₹5000+
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear All</button>
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
